@@ -1,65 +1,140 @@
-import Head from 'next/head'
-import styles from '../styles/Home.module.css'
+import Head from "next/head";
+import { Component } from "react";
 
-export default function Home() {
-  return (
-    <div className={styles.container}>
-      <Head>
-        <title>Create Next App</title>
-        <link rel="icon" href="/favicon.ico" />
-      </Head>
+import { Container, Row, Col } from "react-bootstrap";
+import EvidenceButton from "../components/EvidenceButton";
+import GhostInfo from "../components/GhostInfo";
 
-      <main className={styles.main}>
-        <h1 className={styles.title}>
-          Welcome to <a href="https://nextjs.org">Next.js!</a>
-        </h1>
+const _evidenceTypes = {
+  emf: { label: "EMF 5" },
+  orbs: { label: "Ghost Orbs" },
+  writing: { label: "Ghost Writing" },
+  temps: { label: "Freezing Temps" },
+  spirit: { label: "Spirit Box" },
+  fingerPrints: { label: "Finger Prints" },
+};
 
-        <p className={styles.description}>
-          Get started by editing{' '}
-          <code className={styles.code}>pages/index.js</code>
-        </p>
+const _ghostTypes = [
+  {
+    name: "Spirit",
+    requiredEvidenceTypes: ["writing", "spirit", "fingerPrints"],
+  },
+  {
+    name: "Wraith",
+    requiredEvidenceTypes: ["temps", "spirit", "fingerPrints"],
+  },
+  {
+    name: "Phantom",
+    requiredEvidenceTypes: ["emf", "orbs", "temps"],
+  },
+  {
+    name: "Poltergeist",
+    requiredEvidenceTypes: ["spirit", "orbs", "fingerPrints"],
+  },
+  {
+    name: "Banshee",
+    requiredEvidenceTypes: ["emf", "fingerPrints", "temps"],
+  },
+  {
+    name: "Jinn",
+    requiredEvidenceTypes: ["emf", "orbs", "spirit"],
+  },
+  {
+    name: "Mare",
+    requiredEvidenceTypes: ["spirit", "orbs", "temps"],
+  },
+  {
+    name: "Revenant",
+    requiredEvidenceTypes: ["emf", "writing", "fingerPrints"],
+  },
+  {
+    name: "Shade",
+    requiredEvidenceTypes: ["emf", "orbs", "writing"],
+  },
+  {
+    name: "Demon",
+    requiredEvidenceTypes: ["writing", "spirit", "temps"],
+  },
+  {
+    name: "Yurei",
+    requiredEvidenceTypes: ["writing", "orbs", "temps"],
+  },
+  {
+    name: "Oni",
+    requiredEvidenceTypes: ["emf", "writing", "spirit"],
+  },
+];
 
-        <div className={styles.grid}>
-          <a href="https://nextjs.org/docs" className={styles.card}>
-            <h3>Documentation &rarr;</h3>
-            <p>Find in-depth information about Next.js features and API.</p>
-          </a>
+class Home extends Component {
+  constructor(props) {
+    super(props);
+    let initialState = {};
+    Object.keys(_evidenceTypes).forEach((evidence) => {
+      initialState[evidence] = "unknown";
+    });
+    this.state = initialState;
+  }
 
-          <a href="https://nextjs.org/learn" className={styles.card}>
-            <h3>Learn &rarr;</h3>
-            <p>Learn about Next.js in an interactive course with quizzes!</p>
-          </a>
+  updateEvidence = (evidenceKey, found) => {
+    this.setState((state, props) => {
+      let evidence = {};
+      evidence[evidenceKey] = found;
+      return evidence;
+    });
+  };
 
-          <a
-            href="https://github.com/vercel/next.js/tree/master/examples"
-            className={styles.card}
-          >
-            <h3>Examples &rarr;</h3>
-            <p>Discover and deploy boilerplate example Next.js projects.</p>
-          </a>
+  renderButton = (evidence) => (
+    <EvidenceButton
+      key={evidence}
+      onEvidenceChange={(found) => this.updateEvidence(evidence, found)}
+    >
+      {_evidenceTypes[evidence].label}
+    </EvidenceButton>
+  );
 
-          <a
-            href="https://vercel.com/import?filter=next.js&utm_source=create-next-app&utm_medium=default-template&utm_campaign=create-next-app"
-            className={styles.card}
-          >
-            <h3>Deploy &rarr;</h3>
-            <p>
-              Instantly deploy your Next.js site to a public URL with Vercel.
-            </p>
-          </a>
-        </div>
-      </main>
+  render() {
+    const buttons = Object.keys(_evidenceTypes).map((evidence, i) => (
+      <Col key={evidence} className="d-flex" xs="12" sm="6" md="4" lg="2">
+        {this.renderButton(evidence)}
+      </Col>
+    ));
 
-      <footer className={styles.footer}>
-        <a
-          href="https://vercel.com?utm_source=create-next-app&utm_medium=default-template&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Powered by{' '}
-          <img src="/vercel.svg" alt="Vercel Logo" className={styles.logo} />
-        </a>
-      </footer>
-    </div>
-  )
+    const ghostRows = _ghostTypes
+      .sort((a, b) => (a.name < b.name ? -1 : 1))
+      .map((ghost) => {
+        let evidence = ghost.requiredEvidenceTypes.map((type) => ({
+          label: _evidenceTypes[type].label,
+          found: this.state[type],
+        }));
+        return (
+          <GhostInfo
+            key={ghost.name}
+            name={ghost.name}
+            requiredEvidence={evidence}
+          ></GhostInfo>
+        );
+      });
+
+    return (
+      <>
+        <Head>
+          <title>Create Next App</title>
+          <link rel="icon" href="/favicon.ico" />
+        </Head>
+
+        <Container fluid="md">
+          <Row>
+            <Col>
+              <h1>Phasmocalc</h1>
+            </Col>
+          </Row>
+          <br />
+          <Row className="justify-content-center no-gutters">{buttons}</Row>
+          {ghostRows}
+        </Container>
+      </>
+    );
+  }
 }
+
+export default Home;
