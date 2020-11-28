@@ -14,7 +14,22 @@ export default class GhostInfo extends Component {
       .map((evidence) => evidence.label)
       .sort()
       .map((evidence, i) => this.renderEvidence(evidence, i));
-    if (remainingEvidence.length === 0) {
+    // Does this match the found evidence
+    let matchesFilter = this.props.foundEvidence.reduce(
+      (acc, evidenceType) =>
+        acc &&
+        this.props.requiredEvidence.some(
+          (evidence) => evidence.type === evidenceType
+        ),
+      true
+    );
+    // Is any of the evidence rejected?
+    matchesFilter =
+      matchesFilter &&
+      !this.props.requiredEvidence
+        .map((evidence) => evidence.type)
+        .some((evidence) => this.props.rejectedEvidence.includes(evidence));
+    if (!matchesFilter) {
       return <></>;
     }
     return (

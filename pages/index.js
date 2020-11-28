@@ -103,14 +103,23 @@ class Home extends Component {
       .sort((a, b) => (a.name < b.name ? -1 : 1))
       .map((ghost) => {
         let evidence = ghost.requiredEvidenceTypes.map((type) => ({
+          type: type,
           label: _evidenceTypes[type].label,
           found: this.state[type],
         }));
+        let foundEvidence = Object.entries(this.state)
+          .filter((entry) => entry[1] === "true")
+          .map((entry) => entry[0]);
+        let rejectedEvidence = Object.entries(this.state)
+          .filter((entry) => entry[1] === "false")
+          .map((entry) => entry[0]);
         return (
           <GhostInfo
             key={ghost.name}
             name={ghost.name}
             requiredEvidence={evidence}
+            foundEvidence={foundEvidence}
+            rejectedEvidence={rejectedEvidence}
           ></GhostInfo>
         );
       });
