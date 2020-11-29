@@ -1,9 +1,10 @@
 import React, { Component } from "react";
 import { Row, Col } from "react-bootstrap";
+import EvidenceState from "../services/EvidenceState";
 
 export default class GhostInfo extends Component {
   renderEvidence = (evidenceType, evidence) => {
-    if (this.props.allEvidence[evidenceType] === "unknown") {
+    if (this.props.allEvidence[evidenceType] === EvidenceState.Unknown) {
       return (
         <Col
           key={evidenceType}
@@ -27,11 +28,12 @@ export default class GhostInfo extends Component {
       );
 
     let foundEvidence = Object.entries(this.props.allEvidence)
-      .filter((entry) => entry[1] === "true")
-      .map((entry) => entry[0]);
+      .filter(([_, state]) => state === EvidenceState.Found)
+      .map(([evidenceType, _]) => evidenceType);
+
     let rejectedEvidence = Object.entries(this.props.allEvidence)
-      .filter((entry) => entry[1] === "false")
-      .map((entry) => entry[0]);
+      .filter(([_, state]) => state === EvidenceState.Rejected)
+      .map(([evidenceType, _]) => evidenceType);
 
     // Does this match all the found evidence and none of the rejected evidence?
     let matchesFilter =

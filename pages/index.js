@@ -3,6 +3,7 @@ import { Component } from "react";
 
 import { Container, Row, Col } from "react-bootstrap";
 import deepFreeze from "../utilities/deepFreeze";
+import EvidenceState from "../services/EvidenceState";
 import EvidenceButton from "../components/EvidenceButton";
 import GhostInfo from "../components/GhostInfo";
 
@@ -69,40 +70,30 @@ const _ghostTypes = deepFreeze([
 class Home extends Component {
   constructor(props) {
     super(props);
-    let initialState = {};
-    Object.keys(_evidenceTypes).forEach((evidence) => {
-      initialState[evidence] = "unknown";
-    });
-    this.state = initialState;
+    this.state = Object.keys(_evidenceTypes).reduce(
+      (result, type) => ((result[type] = EvidenceState.Unknown), result),
+      {}
+    );
   }
 
-  updateEvidence = (evidenceKey, found) => {
-    this.setState((state, props) => {
-      let evidence = {};
-      evidence[evidenceKey] = found;
-      return evidence;
-    });
-  };
+  updateEvidence = (evidenceType, found) =>
+    this.setState({ [evidenceType]: found });
 
-  renderButton = (evidence) => (
-    <Col key={evidence} className="d-flex" xs="12" sm="6" md="4" lg="2">
+  renderButton = (evidenceType) => (
+    <Col key={evidenceType} className="d-flex" xs="12" sm="6" md="4" lg="2">
       <EvidenceButton
-        key={evidence}
-        onEvidenceChange={(found) => this.updateEvidence(evidence, found)}
+        key={evidenceType}
+        onEvidenceChange={(found) => this.updateEvidence(evidenceType, found)}
       >
-        {_evidenceTypes[evidence].label}
+        {_evidenceTypes[evidenceType].label}
       </EvidenceButton>
     </Col>
   );
 
   renderGhostInfo = (ghostType) => {
-    let requiredEvidence = Object.assign(
-      {},
-      ...ghostType.requiredEvidenceTypes.map((type) => ({
-        [type]: {
-          label: _evidenceTypes[type].label,
-        },
-      }))
+    let requiredEvidence = ghostType.requiredEvidenceTypes.reduce(
+      (result, type) => ((result[type] = _evidenceTypes[type]), result),
+      {}
     );
     return (
       <GhostInfo

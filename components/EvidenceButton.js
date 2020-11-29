@@ -1,26 +1,16 @@
 import React, { Component } from "react";
 import { Button } from "react-bootstrap";
+import EvidenceState from "../services/EvidenceState";
 
 export default class EvidenceButton extends Component {
   constructor(props) {
     super(props);
-    this.state = { found: "unknown" };
+    this.state = { found: EvidenceState.Unknown };
   }
 
-  handleClick = (e) => {
+  handleClick = () => {
     this.setState((state) => {
-      let nextState = { found: state.found };
-      switch (state.found) {
-        case "unknown":
-          nextState.found = "true";
-          break;
-        case "true":
-          nextState.found = "false";
-          break;
-        case "false":
-          nextState.found = "unknown";
-          break;
-      }
+      let nextState = { found: state.found.next() };
       this.props.onEvidenceChange?.call(this, nextState.found);
       return nextState;
     });
@@ -29,10 +19,10 @@ export default class EvidenceButton extends Component {
   render() {
     let className;
     switch (this.state.found) {
-      case "true":
+      case EvidenceState.Found:
         className = "success";
         break;
-      case "false":
+      case EvidenceState.Rejected:
         className = "danger";
         break;
       default:
