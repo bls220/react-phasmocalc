@@ -2,19 +2,20 @@ import Head from "next/head";
 import { Component } from "react";
 
 import { Container, Row, Col } from "react-bootstrap";
+import deepFreeze from "../utilities/deepFreeze";
 import EvidenceButton from "../components/EvidenceButton";
 import GhostInfo from "../components/GhostInfo";
 
-const _evidenceTypes = {
+const _evidenceTypes = deepFreeze({
   emf: { label: "EMF 5" },
   orbs: { label: "Ghost Orbs" },
   writing: { label: "Ghost Writing" },
   temps: { label: "Freezing Temps" },
   spirit: { label: "Spirit Box" },
   fingerPrints: { label: "Finger Prints" },
-};
+});
 
-const _ghostTypes = [
+const _ghostTypes = deepFreeze([
   {
     name: "Spirit",
     requiredEvidenceTypes: ["writing", "spirit", "fingerPrints"],
@@ -63,7 +64,7 @@ const _ghostTypes = [
     name: "Oni",
     requiredEvidenceTypes: ["emf", "writing", "spirit"],
   },
-];
+]);
 
 class Home extends Component {
   constructor(props) {
@@ -84,45 +85,41 @@ class Home extends Component {
   };
 
   renderButton = (evidence) => (
-    <EvidenceButton
-      key={evidence}
-      onEvidenceChange={(found) => this.updateEvidence(evidence, found)}
-    >
-      {_evidenceTypes[evidence].label}
-    </EvidenceButton>
+    <Col key={evidence} className="d-flex" xs="12" sm="6" md="4" lg="2">
+      <EvidenceButton
+        key={evidence}
+        onEvidenceChange={(found) => this.updateEvidence(evidence, found)}
+      >
+        {_evidenceTypes[evidence].label}
+      </EvidenceButton>
+    </Col>
   );
 
-  render() {
-    const buttons = Object.keys(_evidenceTypes).map((evidence, i) => (
-      <Col key={evidence} className="d-flex" xs="12" sm="6" md="4" lg="2">
-        {this.renderButton(evidence)}
-      </Col>
-    ));
-
-    const ghostRows = _ghostTypes
-      .sort((a, b) => (a.name < b.name ? -1 : 1))
-      .map((ghost) => {
-        let evidence = ghost.requiredEvidenceTypes.map((type) => ({
-          type: type,
+  renderGhostInfo = (ghostType) => {
+    let requiredEvidence = Object.assign(
+      {},
+      ...ghostType.requiredEvidenceTypes.map((type) => ({
+        [type]: {
           label: _evidenceTypes[type].label,
-          found: this.state[type],
-        }));
-        let foundEvidence = Object.entries(this.state)
-          .filter((entry) => entry[1] === "true")
-          .map((entry) => entry[0]);
-        let rejectedEvidence = Object.entries(this.state)
-          .filter((entry) => entry[1] === "false")
-          .map((entry) => entry[0]);
-        return (
-          <GhostInfo
-            key={ghost.name}
-            name={ghost.name}
-            requiredEvidence={evidence}
-            foundEvidence={foundEvidence}
-            rejectedEvidence={rejectedEvidence}
-          ></GhostInfo>
-        );
-      });
+        },
+      }))
+    );
+    return (
+      <GhostInfo
+        key={ghostType.name}
+        name={ghostType.name}
+        requiredEvidence={requiredEvidence}
+        allEvidence={this.state}
+      ></GhostInfo>
+    );
+  };
+
+  render() {
+    const buttons = Object.keys(_evidenceTypes).map(this.renderButton);
+
+    const ghostRows = [..._ghostTypes]
+      .sort((a, b) => (a.name < b.name ? -1 : 1))
+      .map(this.renderGhostInfo);
 
     return (
       <>
