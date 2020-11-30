@@ -115,18 +115,25 @@ class Home extends Component {
     return (
       <>
         <Head>
-          <title>Create Next App</title>
+          <title>React Phasmocalc</title>
           <link rel="icon" href="/favicon.ico" />
         </Head>
 
-        <Container fluid="md">
+        <Container fluid="xl">
           <Row>
             <Col>
               <h1>Phasmocalc</h1>
             </Col>
           </Row>
           <br />
-          <Row className="justify-content-center no-gutters">{buttons}</Row>
+          <Row>
+            <Col xs="12" sm="2">
+              {" "}
+            </Col>
+            <Col sm="10">
+              <Row className="no-gutters">{buttons}</Row>
+            </Col>
+          </Row>
           {ghostRows}
         </Container>
       </>
