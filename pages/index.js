@@ -5,7 +5,7 @@ import { Container, Row, Col } from "react-bootstrap";
 import deepFreeze from "../utilities/deepFreeze";
 import EvidenceState from "../services/EvidenceState";
 import EvidenceButton from "../components/EvidenceButton";
-import GhostInfo from "../components/GhostInfo";
+import GhostInfo from "../components/GhostInfo/GhostInfo";
 
 const _evidenceTypes = deepFreeze({
   emf: { label: "EMF 5" },
@@ -95,12 +95,22 @@ class Home extends Component {
       (result, type) => ((result[type] = _evidenceTypes[type]), result),
       {}
     );
+    let evidence = Object.keys(_evidenceTypes).reduce(
+      (result, evidenceType) => (
+        (result[evidenceType] = {
+          state: this.state[evidenceType],
+          label: _evidenceTypes[evidenceType].label,
+        }),
+        result
+      ),
+      {}
+    );
     return (
       <GhostInfo
         key={ghostType.name}
         name={ghostType.name}
-        requiredEvidence={requiredEvidence}
-        allEvidence={this.state}
+        requiredEvidence={ghostType.requiredEvidenceTypes}
+        allEvidence={evidence}
       ></GhostInfo>
     );
   };
@@ -126,7 +136,7 @@ class Home extends Component {
             </Col>
           </Row>
           <br />
-          <Row>
+          <Row className="mb-4">
             <Col xs="12" sm="2">
               {" "}
             </Col>
