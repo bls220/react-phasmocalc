@@ -91,10 +91,6 @@ class Home extends Component {
   );
 
   renderGhostInfo = (ghostType) => {
-    let requiredEvidence = ghostType.requiredEvidenceTypes.reduce(
-      (result, type) => ((result[type] = _evidenceTypes[type]), result),
-      {}
-    );
     let evidence = Object.keys(_evidenceTypes).reduce(
       (result, evidenceType) => (
         (result[evidenceType] = {
