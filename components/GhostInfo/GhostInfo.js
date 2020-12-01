@@ -13,8 +13,8 @@ export default class GhostInfo extends Component {
       <Col
         key={evidenceType}
         xs="12"
-        sm="4"
-        md="3"
+        sm="6"
+        md="4"
         lg="2"
         className="text-nowrap"
       >
@@ -54,7 +54,7 @@ export default class GhostInfo extends Component {
         <Col xs="12" sm="2">
           {this.props.name}
         </Col>
-        <Col>
+        <Col xs="12" sm="10">
           <Row className="ml-3">{remainingEvidence}</Row>
         </Col>
       </Row>
